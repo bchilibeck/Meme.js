@@ -34,12 +34,27 @@
 
 	$.fn.ready(function() {
 
-		Meme('example.jpg', 'canvas');
+		var memeCreator = Meme('pompousbasset.png', 'canvas', 320);
 
 		$('#top-line, #bottom-line').keyup(function() {
-			Meme('example.jpg', 'canvas', $('#top-line').val(), $('#bottom-line').val());
+			memeCreator.updateText($('#top-line').val(), $('#bottom-line').val());
 		});
 
+		$("#caps").on("click", function(){
+			memeCreator.toggleAllCaps();
+		});
+
+		$("#italics").on("click", function(){
+			memeCreator.toggleItalics();
+		});
+
+		$("#fontsize").change(function(){
+			memeCreator.setFontSize($(this).val());
+		});
+
+		$("#fontfamily").change(function(){
+			memeCreator.setFontFamily($(this).val());
+		});
 	});
 
 	</script>
@@ -52,7 +67,26 @@
 
 	<input id="top-line" placeholder="top line">
 	<input id="bottom-line" placeholder="bottom line">
-
+	<br /><br />
+	<input id="caps" type="button" value="Toggle All Caps" />
+	<input id="italics" type="button" value="Toggle Italics" />
+	<br /><br />
+	<label>FontSize</label>
+	<select id="fontsize">
+		<option value="10">Small</option>
+		<option selected="true" value="8">Medium</option>
+		<option value="6">Large</option>
+	</select>
+	<br /><br />
+	<label>Font Family</label>
+	<select id="fontfamily">
+		<option value="Impact">Impact</option>
+		<option value="Verdana">Verdana</option>		
+		<option value="Courier">Courier</option>
+		<option value="Tahoma">Tahoma</option>
+		<option value="Comic Sans">Comic Sans</option>
+	</select>
+	<br />
 	<canvas id="canvas"></canvas>
 
 </body>

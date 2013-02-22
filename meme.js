@@ -48,14 +48,19 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 */
 
-window.Meme = function(image, canvas, top, bottom) {
+var Meme = function(image, canvas, maxsize, top, bottom) {
 
 	/*
 	Default top and bottom
 	*/
-
-	top = top || '';
-	bottom = bottom || '';
+	var meme = {};
+	var maxsize = maxsize;
+	var top = top || '';
+	var bottom = bottom || '';
+	var allCaps = allCaps || false;
+	var italics = italics || false;
+	var textsize = textsize || 8;
+	var fontfamily = fontfamily || "Impact";
 
 	/*
 	Deal with the canvas
@@ -65,7 +70,7 @@ window.Meme = function(image, canvas, top, bottom) {
 	if (!canvas)
 		canvas = 0;
 
-	// If it's a string, conver it
+	// If it's a string, convert it
 	if (canvas.toUpperCase)
 		canvas = document.getElementById(canvas);
 
@@ -100,7 +105,8 @@ window.Meme = function(image, canvas, top, bottom) {
 		canvas.width = w;
 		canvas.height = h;
 	};
-	setCanvasDimensions(image.width, image.height);	
+
+	setCanvasDimensions(image.width, image.height);
 
 	/*
 	Draw a centered meme string
@@ -109,13 +115,21 @@ window.Meme = function(image, canvas, top, bottom) {
 	var drawText = function(text, topOrBottom, y) {
 
 		// Variable setup
+		text = allCaps ? text.toUpperCase() : text;
 		topOrBottom = topOrBottom || 'top';
-		var fontSize = (canvas.height / 8);
+		var fontSize = (canvas.height / textsize);
 		var x = canvas.width / 2;
 		if (typeof y === 'undefined') {
 			y = fontSize;
-			if (topOrBottom === 'bottom')
-				y = canvas.height - 10;
+			if (topOrBottom === 'bottom') {
+
+				if ( fontfamily === 'Impact' ) {
+					y = canvas.height - 20;
+				} else {
+					y = canvas.height - 35;
+				}
+
+			}
 		}
 
 		// Should we split it into multiple lines?
@@ -150,41 +164,151 @@ window.Meme = function(image, canvas, top, bottom) {
 					}
 				}
 			}
-
 		}
 
 		// Draw!
-		context.fillText(text, x, y, canvas.width * .9);
-		context.strokeText(text, x, y, canvas.width * .9);
+		//strokeText is fucked on BB10
+		if ( navigator.userAgent.match(/(BB10; Touch)/i) ) {
 
+			context.shadowBlur = 0;
+			context.shadowColor = "black";
+
+			context.shadowOffsetX = -2;
+			context.shadowOffsetY = 0;
+			context.fillText(text, x, y, canvas.width * .9);
+
+			context.shadowOffsetX = 2;
+			context.shadowOffsetY = 0;
+			context.fillText(text, x, y, canvas.width * .9);
+
+			context.shadowOffsetX = 0;
+			context.shadowOffsetY = -2;
+			context.fillText(text, x, y, canvas.width * .9);
+
+			context.shadowOffsetX = 0;
+			context.shadowOffsetY = 2;
+			context.fillText(text, x, y, canvas.width * .9);
+
+			context.shadowOffsetX = 2;
+			context.shadowOffsetY = 2;
+			context.fillText(text, x, y, canvas.width * .9);
+
+			context.shadowOffsetX = -2;
+			context.shadowOffsetY = -2;
+			context.fillText(text, x, y, canvas.width * .9);
+
+			context.shadowOffsetX = 2;
+			context.shadowOffsetY = -2;
+			context.fillText(text, x, y, canvas.width * .9);
+
+			context.shadowOffsetX = -2;
+			context.shadowOffsetY = 2;
+			context.fillText(text, x, y, canvas.width * .9);
+		} else {
+			context.strokeText(text, x, y, canvas.width * .9);
+		}
 	};
 
-	/*
-	Do everything else after image loads
-	*/
-
+	//Do everything else after image loads
 	image.onload = function() {
+		
+		maxsize = maxsize || this.width;
+
+		var temp = this.width/this.height;
+		var tempW = maxsize;
+		var tempH = maxsize/temp;
+		var offset = 0;
+
+		if ( this.height > this.width ) {
+			temp = this.height/this.width;
+			tempW = maxsize/temp;
+			tempH = maxsize;
+			offset = (tempH-tempW)/2;
+			maxsize = maxsize || this.height;
+
+			$("canvas").css("margin-left", offset + "px");
+			$("canvas").css("margin-top", "10px");
+		}
 
 		// Set dimensions
-		setCanvasDimensions(this.width, this.height);
+		setCanvasDimensions(tempW, tempH);
 
 		// Draw the image
-		context.drawImage(image, 0, 0);
+		context.drawImage(image, 0, 0, tempW, tempH);
 
 		// Set up text variables
 		context.fillStyle = 'white';
 		context.strokeStyle = 'black';
 		context.lineWidth = 2;
+
 		var fontSize = (canvas.height / 8);
-		context.font = fontSize + 'px Impact';
+		context.font = fontSize + 'px ' + fontfamily;
 		context.textAlign = 'center';
 
 		// Draw them!
 		drawText(top, 'top');
 		drawText(bottom, 'bottom');
-
 	};
 
+	var redrawText = function() {
+		context.drawImage(image, 0, 0, canvas.width, canvas.height);
+		drawText(top, 'top');
+		drawText(bottom, 'bottom');
+	};
+
+	var setFont = function() {
+		context.font = getFontString(italics, textsize);
+		redrawText();
+	};
+
+	var getFontString = function(italics, size) {
+		var italic = italics ? 'italic ' : '';
+		return italic + (canvas.height / size) + 'px ' + fontfamily;
+	};
+
+	meme.updateText = function(newTop, newBottom) {
+		context.drawImage(image, 0, 0, canvas.width, canvas.height);
+		drawText(newTop, 'top');
+		drawText(newBottom, 'bottom');
+		top = newTop;
+		bottom = newBottom;
+	};
+
+	meme.updateTopText = function(newTop) {
+		context.drawImage(image, 0, 0, canvas.width, canvas.height);
+		drawText(newTop, 'top');
+		drawText(bottom, 'bottom');
+		top = newTop;
+	};
+
+	meme.updateBottomText = function(newBottom) {
+		context.drawImage(image, 0, 0, canvas.width, canvas.height);
+		drawText(top, 'top');
+		drawText(newBottom, 'bottom');
+		bottom = newBottom;
+	};
+
+	meme.toggleAllCaps = function() {
+		allCaps = !allCaps;
+		redrawText();
+	};
+	
+	meme.toggleItalics = function() {
+		italics = !italics;
+		setFont();
+	};
+
+	meme.setFontSize = function(size) {
+		textsize = size;
+		setFont();
+	};
+
+	meme.setFontFamily = function(family) {
+		fontfamily = family;
+		setFont();
+	};
+
+	return meme;
 };
 
 /*
