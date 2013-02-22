@@ -205,6 +205,7 @@ var Meme = function(image, canvas, maxsize, top, bottom) {
 			context.shadowOffsetY = 2;
 			context.fillText(text, x, y, canvas.width * .9);
 		} else {
+			context.fillText(text, x, y, canvas.width * .9);
 			context.strokeText(text, x, y, canvas.width * .9);
 		}
 	};

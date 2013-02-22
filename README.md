@@ -5,23 +5,23 @@ Use one function to generate a meme.
 
 You can call it all with strings:
 
-    var memeCreator = Meme('dog.jpg', 'canvasID', 320, 'Buy pizza, 'Pay in snakes');
+    var memeCreator = Meme('dog.jpg', 'canvasID', 500, 'Buy pizza, 'Pay in snakes');
 
 Or with a selected canvas element:
 
     var canvas = document.getElementById('canvasID');
-    var memeCreator =Meme('wolf.jpg', canvas, 320, 'The time is now', 'to take what\'s yours');
+    var memeCreator =Meme('wolf.jpg', canvas, 500, 'The time is now', 'to take what\'s yours');
 
 Or with a jQuery/Zepto selection:
 
-    Meme('spidey.jpg', $('#canvasID'), 320, 'Did someone say', 'Spiderman JS?');
+    Meme('spidey.jpg', $('#canvasID'), 500, 'Did someone say', 'Spiderman JS?');
 
 You can also pass in an image:
 
     var img = new Image();
     img.src = 'insanity.jpg';
     var can = document.getElementById('canvasID');
-    var memeCreator = Meme(img, can, 'you ignore my calls', 320, 'I ignore your screams of mercy');
+    var memeCreator = Meme(img, can, 'you ignore my calls', 500, 'I ignore your screams of mercy');
 
 The Meme.js arguments are as follows:
 
@@ -33,7 +33,7 @@ The Meme.js arguments are as follows:
 
 You also toggle many text effects:
 	
-	var memeCreator = Meme(img, can, 'you ignore my calls', 320, 'I ignore your screams of mercy');
+	var memeCreator = Meme(img, can, 'you ignore my calls', 500, 'I ignore your screams of mercy');
 
 	memeCreator.toggleAllCaps();
 	memeCreator.toggleItalics();
